@@ -2,9 +2,17 @@ from __future__ import print_function, division
 
 import fnmatch
 import json
+import math
+import multiprocessing
 import os
 import re
 import sys
+
+
+CMD_VAR_RE = re.compile(r'^\s*cmd_(\S+)\s*:=\s*(.+)\s*$', re.MULTILINE)
+SOURCE_VAR_RE = re.compile(r'^\s*source_(\S+)\s*:=\s*(.+)\s*$', re.MULTILINE)
+
+directory = os.path.abspath(os.getcwd())
 
 
 def print_progress_bar(progress):
@@ -12,46 +20,50 @@ def print_progress_bar(progress):
     print('\r', progress_bar, "{0:.1%}".format(progress), end='\r', file=sys.stderr)
 
 
-def parse_var(line, var_re, target_dict, cmdfile_path):
-    match = var_re.match(line)
-    if match:
-        if match.group(1) in target_dict:
-            print("Duplicate", match.group(0), "in", cmdfile_path, file=sys.stderr)
-        else:
-            target_dict[match.group(1)] = match.group(2)
-
-
-CMD_VAR_RE = re.compile(r'cmd_(\S+)\s:=\s(.+)')
-SOURCE_VAR_RE = re.compile(r'source_(\S+)\s:=\s(.+)')
-
-directory = os.path.abspath(os.getcwd())
-cmd_files = []
-for cur_dir, subdir, files in os.walk(directory):
-    cmd_files.extend(os.path.join(cur_dir, cmdfile_name) for cmdfile_name in fnmatch.filter(files, '*.o.cmd'))
-
-o_file_command = {}
-o_file_source = {}
-n_processed = 0
-print_progress_bar(0)
-
-for cmdfile_path in cmd_files:
+def parse_cmd_file(cmdfile_path):
     with open(cmdfile_path, 'r') as cmdfile:
-        for line in cmdfile:
-            parse_var(line, CMD_VAR_RE, o_file_command, cmdfile_path)
-            parse_var(line, SOURCE_VAR_RE, o_file_source, cmdfile_path)
+        cmdfile_content = cmdfile.read()
 
-    n_processed += 1
-    print_progress_bar(n_processed / len(cmd_files))
+    commands = { match.group(1): match.group(2) for match in CMD_VAR_RE.finditer(cmdfile_content) }
+    sources = { match.group(1): match.group(2) for match in SOURCE_VAR_RE.finditer(cmdfile_content) }
 
-print(file=sys.stderr)
-print("Matching sources to commands...", file=sys.stderr)
+    return [{
+            'directory': directory,
+            'command': commands[o_file_name],
+            'file': source,
+            'output': o_file_name
+        } for o_file_name, source in sources.items()]
 
-compdb = [{
-        'directory': directory,
-        'command': o_file_command[o_file_name],
-        'file': source
-    } for o_file_name, source in o_file_source.items()]
 
-print("Writing compile_commands.json...", file=sys.stderr)
-with open('compile_commands.json', 'w') as compdb_file:
-    json.dump(compdb, compdb_file, indent=1)
+def main():
+    print("Building *.o.cmd file list...", file=sys.stderr)
+
+    cmd_files = []
+    for cur_dir, subdir, files in os.walk(directory):
+        cmd_files.extend(os.path.join(cur_dir, cmdfile_name) for cmdfile_name in fnmatch.filter(files, '*.o.cmd'))
+
+    print("Parsing *.o.cmd files...", file=sys.stderr)
+
+    n_processed = 0
+    print_progress_bar(0)
+
+    compdb = []
+    pool = multiprocessing.Pool()
+    try:
+        for compdb_chunk in pool.imap_unordered(parse_cmd_file, cmd_files, chunksize=int(math.sqrt(len(cmd_files)))):
+            compdb.extend(compdb_chunk)
+            n_processed += 1
+            print_progress_bar(n_processed / len(cmd_files))
+
+    finally:
+        pool.terminate()
+        pool.join()
+
+    print(file=sys.stderr)
+    print("Writing compile_commands.json...", file=sys.stderr)
+    with open('compile_commands.json', 'w') as compdb_file:
+        json.dump(compdb, compdb_file, indent=1)
+
+
+if __name__ == '__main__':
+    main()
