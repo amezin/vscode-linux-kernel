@@ -7,6 +7,7 @@
     "[c]": {
         "editor.detectIndentation": false,
         "editor.tabSize": 8,
-        "editor.insertSpaces": false
+        "editor.insertSpaces": false,
+        "editor.rulers": [80]
     }
 }
