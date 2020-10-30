@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from __future__ import print_function, division
 
 import argparse
@@ -35,7 +37,7 @@ def parse_cmd_file(out_dir, cmdfile_path):
         } for o_file_name, source in sources.items()]
 
 
-def gen_compile_commands(out_dir):
+def gen_compile_commands(out_dir, output):
     print("Building *.o.cmd file list...", file=sys.stderr)
 
     out_dir = os.path.abspath(out_dir)
@@ -62,15 +64,24 @@ def gen_compile_commands(out_dir):
         pool.join()
 
     print(file=sys.stderr)
-    print("Writing compile_commands.json...", file=sys.stderr)
+    print("Writing %s..." % (output, ), file=sys.stderr)
 
-    with open('compile_commands.json', 'w') as compdb_file:
+    with open(output, 'w') as compdb_file:
         json.dump(compdb, compdb_file, indent=1)
 
 
 def main():
     cmd_parser = argparse.ArgumentParser()
-    cmd_parser.add_argument('-O', '--out-dir', type=str, default=os.getcwd(), help="Build output directory")
+    default_out_dir = os.getcwd()
+    cmd_parser.add_argument(
+        '-O', '--out-dir',
+        type=str, default=default_out_dir,
+        help="Build output directory, default: %s (current directory)" % (default_out_dir, ))
+    default_output = os.path.abspath(os.path.join(os.path.dirname(__file__), 'compile_commands.json'))
+    cmd_parser.add_argument(
+        '-o', '--output',
+        type=str, default=default_output,
+        help="Path to resulting JSON file, default: %s" % (default_output, ))
     gen_compile_commands(**vars(cmd_parser.parse_args()))
 
 
