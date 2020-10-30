@@ -4,7 +4,7 @@
             "name": "Linux",
             "cStandard": "c11",
             "intelliSenseMode": "gcc-x64",
-            "compileCommands": "${workspaceFolder}/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/.vscode/compile_commands.json"
         }
     ],
     "version": 4

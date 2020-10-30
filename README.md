@@ -32,5 +32,5 @@ In this case, you should pass the directory to `generate_compdb.py`:
 
     $ python .vscode/generate_compdb.py -O ../linux-build
 
-`compile_commands.json` will still be generated in the current directory (root of the `linux` repository).
+`compile_commands.json` will still be generated in the `.vscode` directory (under root of the `linux` repository).
 Unfortunately, `tasks.json` will not work out of the box in this configuration (TODO).
