@@ -34,3 +34,14 @@ In this case, you should pass the directory to `generate_compdb.py`:
 
 `compile_commands.json` will still be generated in the current directory (root of the `linux` repository).
 Unfortunately, `tasks.json` will not work out of the box in this configuration (TODO).
+
+Out-of-tree module development
+------------------------------
+
+If you build your module with this command:
+
+    $ make -C $KDIR M=$PWD modules
+
+You could generate `compile_commands.json` with:
+
+    $ python .vscode/generate_compdb.py -O $KDIR $PWD

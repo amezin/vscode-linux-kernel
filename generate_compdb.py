@@ -35,14 +35,21 @@ def parse_cmd_file(out_dir, cmdfile_path):
         } for o_file_name, source in sources.items()]
 
 
-def gen_compile_commands(out_dir):
+def gen_compile_commands(cmd_file_search_path, out_dir):
     print("Building *.o.cmd file list...", file=sys.stderr)
 
     out_dir = os.path.abspath(out_dir)
 
+    if not cmd_file_search_path:
+        cmd_file_search_path = [out_dir]
+
     cmd_files = []
-    for cur_dir, subdir, files in os.walk(out_dir):
-        cmd_files.extend(os.path.join(cur_dir, cmdfile_name) for cmdfile_name in fnmatch.filter(files, '*.o.cmd'))
+    for search_path in cmd_file_search_path:
+        if (os.path.isdir(search_path)):
+            for cur_dir, subdir, files in os.walk(search_path):
+                cmd_files.extend(os.path.join(cur_dir, cmdfile_name) for cmdfile_name in fnmatch.filter(files, '*.o.cmd'))
+        else:
+            cmd_files.extend(search_path)
 
     print("Parsing *.o.cmd files...", file=sys.stderr)
 
@@ -71,6 +78,7 @@ def gen_compile_commands(out_dir):
 def main():
     cmd_parser = argparse.ArgumentParser()
     cmd_parser.add_argument('-O', '--out-dir', type=str, default=os.getcwd(), help="Build output directory")
+    cmd_parser.add_argument('cmd_file_search_path', nargs='*', help="*.cmd file search path")
     gen_compile_commands(**vars(cmd_parser.parse_args()))
 
 
