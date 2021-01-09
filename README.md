@@ -15,12 +15,12 @@ Generate compile_commands.json:
     $ python .vscode/generate_compdb.py
 
 If you are not compiling kernel for x64, change `intelliSenseMode` in
-c_cpp_properties.json. Possible values as of vscode-cpptools 1.0.1:
+`c_cpp_properties.json`. Possible values as of vscode-cpptools 1.0.1:
 
-* gcc-x86
-* gcc-x64
-* gcc-arm
-* gcc-arm64
+* `gcc-x86`
+* `gcc-x64`
+* `gcc-arm`
+* `gcc-arm64`
 
 Open the project:
 
