@@ -1,4 +1,4 @@
-withVisual Studio Code project for Linux kernel sources
+Visual Studio Code project for Linux kernel sources
 ===================================================
 
 Ensure the kernel is built (at least, all `*.cmd` files should be generated):
