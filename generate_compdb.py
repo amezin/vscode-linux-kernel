@@ -53,6 +53,10 @@ def gen_compile_commands(cmd_file_search_path, out_dir):
         else:
             cmd_files.extend(search_path)
 
+    if not cmd_files:
+        print("No *.o.cmd files found in", ", ".join(cmd_file_search_path), file=sys.stderr)
+        return
+
     print("Parsing *.o.cmd files...", file=sys.stderr)
 
     n_processed = 0
