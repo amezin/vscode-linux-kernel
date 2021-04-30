@@ -55,5 +55,3 @@ You could generate `compile_commands.json` with:
     $ python .vscode/generate_compdb.py -O $KDIR $PWD
 
 Ensure that your module has been built and contains some `*.o.cmd` files before generating `compile_commands.json`.
-
-`$KDIR` must be the directory of your kernel source, not your kernel build.
