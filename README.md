@@ -53,3 +53,5 @@ If you build your module with this command:
 You could generate `compile_commands.json` with:
 
     $ python .vscode/generate_compdb.py -O $KDIR $PWD
+
+Example: https://github.com/amezin/nzxt-rgb-fan-controller-dkms
