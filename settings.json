@@ -8,7 +8,7 @@
         "editor.detectIndentation": false,
         "editor.tabSize": 8,
         "editor.insertSpaces": false,
-        "editor.rulers": [80]
+        "editor.rulers": [80,100]
     },
     "files.associations": {
         "*.h": "c"
