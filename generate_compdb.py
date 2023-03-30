@@ -13,7 +13,7 @@ import re
 import sys
 
 
-CMD_VAR_RE = re.compile(r'^\s*cmd_(\S+)\s*:=\s*(.+)\s*$', re.MULTILINE)
+CMD_VAR_RE = re.compile(r'^\s*(?:saved)?cmd_(\S+)\s*:=\s*(.+)\s*$', re.MULTILINE)
 SOURCE_VAR_RE = re.compile(r'^\s*source_(\S+)\s*:=\s*(.+)\s*$', re.MULTILINE)
 
 
